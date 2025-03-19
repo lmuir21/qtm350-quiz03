@@ -1,0 +1,29 @@
+# Set permissions for the private key file
+chmod 400 "qtm350.pem"
+
+# Connect to the EC2 instance
+ssh -i "qtm350.pem" ubuntu@ec2-18-223-108-110.us-east-2.compute.amazonaws.com
+
+# Update the package list
+sudo apt update
+
+# Install required Python packages
+sudo apt install -y python3 python3-pandas python3-matplotlib python3-numpy python3-seaborn
+
+# Upload Python script and data file to the EC2 instance
+scp -i "qtm350.pem" weather_data.py ubuntu@ec2-18-223-108-110.us-east-2.compute.amazonaws.com:~
+scp -i "qtm350.pem" weather_data.txt ubuntu@ec2-18-223-108-110.us-east-2.compute.amazonaws.com:~
+
+# Run the Python script on the EC2 instance
+ssh -i "qtm350.pem" ubuntu@ec2-18-223-108-110.us-east-2.compute.amazonaws.com
+python3 weather_analysis.py
+
+# Save OS information to a file on the EC2 instance
+cat /etc/os-release > os.txt
+
+# Download the OS info and analysis result to the local machine
+scp -i "qtm350.pem" ubuntu@ec2-18-223-108-110.us-east-2.compute.amazonaws.com:~/os.txt c:\Users\Llm4\OneDrive\Documents\350\qtm350-quiz03\aws\
+scp -i "qtm350.pem" ubuntu@ec2-18-223-108-110.us-east-2.compute.amazonaws.com:~/weather_analysis.png c:\Users\Llm4\OneDrive\Documents\350\qtm350-quiz03\aws\
+
+# Terminate the EC2 instance to avoid charges
+aws ec2 terminate-instances --instance-ids i-0fd5eb7209a828bae
